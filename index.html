@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<head>
+    <title>A dialogue cartoon</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div id="cartoon_name">
+        A cartoon about comforting a person who thinks himself/herself too ordinary
+    </div>
+    <div id="cartoon_zone">
+       
+    </div>
+    <div id="cartoon_dialogue_zone">
+
+    </div>
+    <script>
+        function to_css_px(number) {
+            return number + "px";
+        }
+        function create(name) {
+            return document.createElementNS("http://www.w3.org/2000/svg", name);
+        }
+        function create_eyes(body_width) {
+            let left_eye = create("circle");
+            let right_eye = create("circle");
+            function paint(eye, cx, cy, r) {
+                eye.setAttribute("r", r);
+                eye.setAttribute("cx", cx);
+                eye.setAttribute("cy", cy);
+            }
+            const eye_radius = 15;
+            const eye_size = 2 * eye_radius;
+            const left_eye_x = body_width / 3 + 15;
+            const right_eye_x = 2 * body_width / 3 - eye_radius;
+            paint(left_eye, to_css_px(left_eye_x), "15px", to_css_px(eye_radius));
+            paint(right_eye, to_css_px(right_eye_x), "15px", to_css_px(eye_radius));
+            return [left_eye, right_eye]
+        }
+        function create_nose(body_width) {
+            let nose = create("ellipse");
+            function paint(nose, cx, cy, rx, ry) {
+                nose.setAttribute("cx", cx);
+                nose.setAttribute("cy", cy);
+                nose.setAttribute("rx", rx);
+                nose.setAttribute("ry", ry);
+            }
+            const nose_x = body_width / 3 + 46;
+            paint(nose, to_css_px(nose_x), "60px", "8px", "15px");
+            return nose;
+        }
+        function create_mouse(body_width) {
+            /* My reference to a smile mouse: 
+            https://learn-the-web.algonquindesign.ca/courses/web-dev-3/svg-smiley-face/
+            https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
+            */
+            let mouth = create("path");
+            function paint(mouth, d, style) {
+                mouth.setAttribute("d", d);
+                mouth.setAttribute("style", style)
+            }
+            const style = "fill: none; stroke: #000; stroke-width: 6px; stroke-linecap: round;";
+            const mouse_left_x = body_width/3 + 15;
+            const mouse_right_x = body_width/3 + 85;
+            const mouth_middle_x = (mouse_left_x + mouse_right_x) / 2;
+            const d = "M" + mouse_left_x + ",80 " + "Q" + mouth_middle_x + ",100 " + mouse_right_x + ",80";
+            paint(mouth, d, style);
+            return mouth;
+        }
+        function create_body(body_width) {
+            let body = create("rect");
+            function paint(body, x, y, w, h, rx) {
+                body.setAttribute("x", x);
+                body.setAttribute("y", y);
+                body.setAttribute("width", w);
+                body.setAttribute("height", h);
+                body.setAttribute("rx", rx);
+            }
+            const x = body_width / 3;
+            paint(body, to_css_px(x), "120px", "100px", "100px", "15px");
+            return body;
+        }
+        function create_legs(body_width) {
+            let left_leg = create("rect");
+            let right_leg = create("rect");
+            function paint(leg, x, y, w, h, rx) {
+                leg.setAttribute("x", x);
+                leg.setAttribute("y", y);
+                leg.setAttribute("width", w);
+                leg.setAttribute("height", h);
+                leg.setAttribute("rx", rx);
+            }
+            const left_leg_x = body_width / 3 + 5;
+            const right_leg_x = 2 * body_width / 3 - 25;
+            paint(left_leg, to_css_px(left_leg_x), "230px", "20px", "70px", "5px");
+            paint(right_leg, to_css_px(right_leg_x), "230px", "20px", "70px", "5px");
+            return [left_leg, right_leg];
+        }
+        function create_hands(body_width) {
+            let left_hand = create("line");
+            let right_hand = create("line");
+            function paint(hand, x1, y1, x2, y2) {
+                hand.setAttribute("x1", x1);
+                hand.setAttribute("y1", y1);
+                hand.setAttribute("x2", x2);
+                hand.setAttribute("y2", y2);
+                hand.setAttribute("stroke", "black");
+                hand.setAttribute("stroke-width", "12px");
+            }
+            left_hand_x1 = 20;
+            left_hand_x2 = body_width / 3 - 20;
+            right_hand_x1 = 2 * body_width / 3 + 20;
+            right_hand_x2 = right_hand_x1 + (left_hand_x2 - left_hand_x1);
+            paint(left_hand, to_css_px(left_hand_x1), "210px", to_css_px(left_hand_x2), "130px");
+            paint(right_hand, to_css_px(right_hand_x1), "130px", to_css_px(right_hand_x2), "210px");
+            return [left_hand, right_hand];
+        }
+        function create_person(name, body_width, body_height) {
+            let person = create("svg");
+            let eyes = create_eyes(body_width);
+            let left_eye = eyes[0];
+            let right_eye = eyes[1];
+            let nose = create_nose(body_width);
+            let mouse = create_mouse(body_width);
+            let body = create_body(body_width);
+            let legs = create_legs(body_width);
+            let left_leg = legs[0];
+            let right_leg = legs[1];
+            let hands = create_hands(body_width);
+            let left_hand = hands[0];
+            let right_hand = hands[1];
+            function paint(person, organ) {  
+                if(!person.getAttribute("id")) {
+                    person.setAttribute("id", name);
+                    person.setAttribute("width", to_css_px(body_width));
+                    person.setAttribute("height", to_css_px(body_height));
+                }
+                person.appendChild(organ);
+            }
+            paint(person, left_eye);
+            paint(person, right_eye);
+            paint(person, nose);
+            paint(person, mouse);
+            paint(person, body);
+            paint(person, left_leg);
+            paint(person, right_leg);
+            paint(person, left_hand);
+            paint(person, right_hand);
+            return person;
+        }
+        let me = create_person("Xinshuai_Lyu", 300, 300);
+        // let he_or_she = create_person();
+        let cartoon_zone = document.getElementById("cartoon_zone");
+        cartoon_zone.appendChild(me);
+    </script>
+</body>
