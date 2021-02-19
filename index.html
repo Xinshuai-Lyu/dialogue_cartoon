@@ -232,11 +232,14 @@
                 nose_animate.setAttribute("dur","1s");
                 nose_animate.setAttribute("repeatCount","indefinite");
                 nose.appendChild(nose_animate);
+            } else {
+                nose.firstChild.setAttribute("repeatCount","indefinite");
             }
         }
 
         function stop_speak_motion(person) {
             let person_id = "#" + person.id;
+            document.getElementById(person.id + "_speaking_zone").innerText = "";   
             let nose = person.querySelector(person_id+" .nose");
             nose.firstChild.setAttribute("repeatCount","2");
             let other_person = person_id == "#Me" ? document.getElementById("You") : document.getElementById("Me");
@@ -295,7 +298,10 @@
 
         words = [
             "Hello How are you?",
-            "Not good, although you see that I am smiling."
+            "Not good, although you see that I am smiling, I am so unhappy!",
+            "Why you are unhappy?",
+            "Because I am afraid that I will be an ordinary person forever!",
+            "No you will not!! Because you have life, life itself is better than money, power, and knowledge! If anyone think that they are better than you just because these things, they are lost in their null world! The richest man's beauty is not more beautiful than a flower and the wisest man's wisdom cannot create a flower. We have human being's life, that is enough, the greatest man in the world is the man with a good heart, that is all!"
         ].reverse();
 
         move_person(me, "right");
