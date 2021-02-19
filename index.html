@@ -5,17 +5,38 @@
         * {
             box-sizing: border-box;
         }
+        #cartoon_zone {
+            top: 70px;
+            position: relative;
+        }
+        #You {
+            position: absolute;
+            right: 0;
+        }
+        #Me {
+            position: relative;
+        }
+        #cartoon_dialogue_zone {
+            position: relative;
+            top: 50px;
+        }
+        #Me_speaking_zone, #You_speaking_zone {
+            display: inline-block;
+            width: 48%;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div id="cartoon_name">
         A cartoon about comforting a person who thinks himself/herself too ordinary
     </div>
+    <div id="cartoon_dialogue_zone">
+        <div id="Me_speaking_zone"></div>
+        <div id="You_speaking_zone"></div>
+    </div>
     <div id="cartoon_zone">
        
-    </div>
-    <div id="cartoon_dialogue_zone">
-
     </div>
     <script>
         function to_css_px(number) {
@@ -24,6 +45,7 @@
         function create(name) {
             return document.createElementNS("http://www.w3.org/2000/svg", name);
         }
+
         function create_eyes(body_width) {
             let left_eye = create("circle");
             let right_eye = create("circle");
@@ -38,6 +60,8 @@
             const right_eye_x = 2 * body_width / 3 - eye_radius;
             paint(left_eye, to_css_px(left_eye_x), "15px", to_css_px(eye_radius));
             paint(right_eye, to_css_px(right_eye_x), "15px", to_css_px(eye_radius));
+            left_eye.setAttribute("class", "left_eye");
+            right_eye.setAttribute("class", "right_eye");
             return [left_eye, right_eye]
         }
         function create_nose(body_width) {
@@ -50,6 +74,7 @@
             }
             const nose_x = body_width / 3 + 46;
             paint(nose, to_css_px(nose_x), "60px", "8px", "15px");
+            nose.setAttribute("class", "nose");
             return nose;
         }
         function create_mouse(body_width) {
@@ -68,6 +93,7 @@
             const mouth_middle_x = (mouse_left_x + mouse_right_x) / 2;
             const d = "M" + mouse_left_x + ",80 " + "Q" + mouth_middle_x + ",100 " + mouse_right_x + ",80";
             paint(mouth, d, style);
+            mouth.setAttribute("class", "mouth");
             return mouth;
         }
         function create_body(body_width) {
@@ -81,6 +107,7 @@
             }
             const x = body_width / 3;
             paint(body, to_css_px(x), "120px", "100px", "100px", "15px");
+            body.setAttribute("class", "body");
             return body;
         }
         function create_legs(body_width) {
@@ -97,6 +124,8 @@
             const right_leg_x = 2 * body_width / 3 - 25;
             paint(left_leg, to_css_px(left_leg_x), "230px", "20px", "70px", "5px");
             paint(right_leg, to_css_px(right_leg_x), "230px", "20px", "70px", "5px");
+            left_leg.setAttribute("class", "left_leg");
+            right_leg.setAttribute("class", "right_leg");
             return [left_leg, right_leg];
         }
         function create_hands(body_width) {
@@ -116,8 +145,11 @@
             right_hand_x2 = right_hand_x1 + (left_hand_x2 - left_hand_x1);
             paint(left_hand, to_css_px(left_hand_x1), "210px", to_css_px(left_hand_x2), "130px");
             paint(right_hand, to_css_px(right_hand_x1), "130px", to_css_px(right_hand_x2), "210px");
+            left_hand.setAttribute("class", "left_hand");
+            right_hand.setAttribute("class", "right_hand");
             return [left_hand, right_hand];
         }
+
         function create_person(name, body_width, body_height) {
             let person = create("svg");
             let eyes = create_eyes(body_width);
@@ -151,9 +183,122 @@
             paint(person, right_hand);
             return person;
         }
-        let me = create_person("Xinshuai_Lyu", 300, 300);
-        // let he_or_she = create_person();
+
         let cartoon_zone = document.getElementById("cartoon_zone");
+
+        const person_width = 300;
+        const person_height = 300;
+        let me = create_person("Me", person_width, person_height);
+        let you = create_person("You", person_width, person_height);
+        
         cartoon_zone.appendChild(me);
+        cartoon_zone.appendChild(you);
+
+        function walk(person, leg_class, direction) {
+            let leg = person.querySelector(leg_class);
+            const leg_x = leg.getAttribute("x").slice(0,-2);
+            let leg_animate = create("animate");
+            leg_animate.setAttribute("attributeName","x");
+            let direction_move = parseInt(leg_x);
+            if(direction == "right") direction_move = ";"+ (direction_move+20) + ";";
+            else direction_move = ";"+ (direction_move-20) + ";";
+            const move = leg_x + direction_move + leg_x;
+            console.log(move);
+            leg_animate.setAttribute("values",move);
+            leg_animate.setAttribute("dur","2s");
+            leg_animate.setAttribute("repeatCount","indefinite");
+            leg.appendChild(leg_animate);
+        }
+
+        walk(me, ".left_leg", "right");
+        walk(me, ".right_leg", "right");
+        walk(you, ".left_leg", "left");
+        walk(you, ".right_leg", "left");
+
+        function speak(person, word) {
+            let speaking_zone = document.getElementById(person.id + "_speaking_zone");
+            speaking_zone.innerText = speaking_zone.innerText + " " + word;
+        }
+
+        function start_speak_motion(person) {
+            let person_id = "#" + person.id;
+            let nose = person.querySelector(person_id+" .nose");
+            if(!nose.firstChild) {
+                const nose_cy = parseInt(nose.getAttribute("cy").slice(0,-2));
+                let nose_animate = create("animate");
+                nose_animate.setAttribute("attributeName","cy");
+                const move = nose_cy + ";"+ (nose_cy-7) + ";" + nose_cy;
+                nose_animate.setAttribute("values",move);
+                nose_animate.setAttribute("dur","1s");
+                nose_animate.setAttribute("repeatCount","indefinite");
+                nose.appendChild(nose_animate);
+            }
+        }
+
+        function stop_speak_motion(person) {
+            let person_id = "#" + person.id;
+            let nose = person.querySelector(person_id+" .nose");
+            nose.firstChild.setAttribute("repeatCount","2");
+            let other_person = person_id == "#Me" ? document.getElementById("You") : document.getElementById("Me");
+            start_speak(other_person, words);
+        }
+
+        function start_speak(person) {
+            if(words.length == 0) {
+                return;
+            }
+            start_speak_motion(person);
+            one_sentence = words.pop().split(" ").reverse()
+            let talk_person_interval = setInterval((person, one_sentence) => {
+                if(one_sentence.length == 0) {
+                    clearInterval(talk_person_interval);
+                    stop_speak_motion(person);
+                } else {
+                    speak(person, one_sentence.pop());
+                }
+            }, 600, person, one_sentence);
+        }
+
+        function move_person(person, direction) {
+            let move_to;
+            const middle_x = document.getElementById("cartoon_zone").offsetWidth/2;
+            function f(person, direction) {
+                let move_to;
+                if(direction == "right"){
+                    if(person.style.left == "") person.style.left="0px";
+                    move_to = parseInt(person.style.left.slice(0,-2)) + 50;
+                } 
+                else {
+                    if(person.style.right == "") person.style.right="0px";
+                    move_to = parseInt(person.style.right.slice(0,-2)) + 50;
+                }
+                if(move_to < middle_x - person_width) {
+                    if(direction == "right"){
+                        person.style.left = to_css_px(move_to);
+                    } else {
+                        person.style.right = to_css_px(move_to);
+                    }
+                }else {
+                    clearInterval(move_person_interval);
+                    console.log("Stop move because I have reached the middle point.");
+                    left_leg = person.querySelector(".left_leg")
+                    right_leg = person.querySelector(".right_leg")
+                    left_leg.removeChild(left_leg.firstChild);
+                    right_leg.removeChild(right_leg.firstChild);
+                    if(person.id == "Me") start_speak(person);
+                }
+            }
+            let move_person_interval = setInterval((person, direction) => {
+                    f(person, direction);
+            }, 600, person, direction);
+        }
+
+        words = [
+            "Hello How are you?",
+            "Not good, although you see that I am smiling."
+        ].reverse();
+
+        move_person(me, "right");
+        move_person(you, "left");
     </script>
 </body>
